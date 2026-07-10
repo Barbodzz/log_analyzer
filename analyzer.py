@@ -15,6 +15,7 @@ def analyze(filePath):
     with open(filePath) as f:
         ips = set()
         lineCounter = 0
+        badLineCounter = 0
         errorCounter = 0
         endpoints = Counter()
         for line in f:
@@ -23,13 +24,18 @@ def analyze(filePath):
             if parsed:
                 ips.add(parsed.get("ip"))
                 endpoints[parsed.get("path")] += 1 
+                status = parsed.get("status")
+                if status[0] == "4" or status[0] == "5":
+                    errorCounter+=1
                 continue
-            errorCounter+=1
+            badLineCounter+=1
+    validLines = lineCounter - badLineCounter
+    errorRate = ( errorCounter / validLines ) * 100
     print(f"Total lines: {lineCounter}")
-    print(f"Bad lines: {errorCounter}")
+    print(f"Bad lines: {badLineCounter}")
     print(f"Unique ips: {len(ips)}")
     print(endpoints.most_common(10))
-
+    print(f"Error rate: {errorRate:.2f}%")
 
 
 analyze("/Users/barbodzz/Downloads/hamamooz_task/access.log")
