@@ -9,5 +9,20 @@ def parse_line(line):
         return match.groupdict()
     return None
 
-line = '64.142.139.54 - - [01/Jun/2026:00:00:00 +0000] "GET /products HTTP/1.1" 200 11390 "-" "curl/8.4.0"'
-print(parse_line(line))
+
+def analyze(filePath):
+    with open(filePath) as f:
+        lineCounter = 0
+        errorCounter = 0
+        for line in f:
+            lineCounter+=1
+            parsed = parse_line(line)
+            if parsed:
+                continue
+            errorCounter+=1
+    print(f"Total lines: {lineCounter}")
+    print(f"Bad lines: {errorCounter}")
+
+
+
+analyze("/Users/barbodzz/Downloads/hamamooz_task/access.log")
