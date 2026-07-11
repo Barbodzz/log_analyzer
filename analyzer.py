@@ -22,7 +22,7 @@ def is_error(status):
     return status[0] in ("4", "5") 
 
 
-def analyze(filePath):
+def analyze(filePath, top = 10):
     if filePath.endswith(".gz"):
         f = gzip.open(filePath, "rt")
     else:
@@ -68,7 +68,7 @@ def analyze(filePath):
     header_ep = "endpoint"
     header_c = "count"
     print(f"{header_ep:<20} | {header_c}")
-    for endpoint in endpoints.most_common(10):
+    for endpoint in endpoints.most_common(top):
         print(f"{endpoint[0]:<20} | {endpoint[1]}")
 
     print(f"\nError rate: {errorRate:.2f}%")
@@ -91,7 +91,8 @@ def analyze(filePath):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("logfile")
+    parser.add_argument("--top", type=int, default=10)
     args = parser.parse_args()
     start = time.time()
-    analyze(args.logfile)
+    analyze(args.logfile, args.top)
     print(f"Executed in {time.time() - start:.2f}s")
