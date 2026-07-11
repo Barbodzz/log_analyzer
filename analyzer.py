@@ -18,12 +18,14 @@ def analyze(filePath):
         badLineCounter = 0
         errorCounter = 0
         endpoints = Counter()
+        times = Counter()
         for line in f:
             lineCounter+=1
             parsed = parse_line(line)
             if parsed:
                 ips.add(parsed.get("ip"))
                 endpoints[parsed.get("path")] += 1 
+                times[parsed.get("time")[12:14]] += 1
                 status = parsed.get("status")
                 if status[0] == "4" or status[0] == "5":
                     errorCounter+=1
@@ -36,6 +38,9 @@ def analyze(filePath):
     print(f"Unique ips: {len(ips)}")
     print(endpoints.most_common(10))
     print(f"Error rate: {errorRate:.2f}%")
+    print("\nTime distribution:")
+    for hour in sorted(times.keys()):
+        print(f"{hour}:00 | {times[hour]}")
 
 
 analyze("/Users/barbodzz/Downloads/hamamooz_task/access.log")
