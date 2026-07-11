@@ -34,9 +34,12 @@ def analyze(filePath):
     validLines = lineCounter - badLineCounter
     errorRate = ( errorCounter / validLines ) * 100
     print(f"Total lines: {lineCounter}")
-    print(f"Bad lines: {badLineCounter}")
-    print(f"Unique ips: {len(ips)}")
-    print(endpoints.most_common(10))
+    print(f"\nBad lines: {badLineCounter}")
+    print(f"\nUnique ips: {len(ips)}")
+    print("Most common endpoints")
+    print(f"{"endpoint":<20} | {"count"}")
+    for endpoint in endpoints.most_common(10):
+        print(f"{endpoint[0]:<20} | {endpoint[1]}")
     print(f"Error rate: {errorRate:.2f}%")
     print("\nTime distribution:")
     for hour in sorted(times.keys()):
