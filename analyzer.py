@@ -43,4 +43,9 @@ def analyze(filePath):
         print(f"{hour}:00 | {times[hour]}")
 
 
-analyze("/Users/barbodzz/Downloads/hamamooz_task/access.log")
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("logfile")
+    args = parser.parse_args()
+    analyze(args.logfile)
