@@ -1,9 +1,16 @@
 # Log Analyzer
 A CLI tool to analyze Apache/Nginx access logs.
 
-## Usage 
+## Usage
+**Requirements:** Python 3.6+
+
 ```bash
-python3 analyzer.py /path/to/log
+python3 analyzer.py /path/to/access.log
+```
+
+**Example:**
+```bash
+python3 analyzer.py /home/user/logs/access.log
 ```
 
 ## Output 
