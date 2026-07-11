@@ -1,6 +1,9 @@
 import re
 from collections import Counter
 import argparse
+import time
+
+
 
 PATTERN = re.compile(
     r'(?P<ip>\S+) - - \[(?P<time>.+)\] \"(?P<method>\S+) (?P<path>\S+) (?P<protocol>\S+)\" (?P<status>\d+) (?P<size>\d+) \"-\" \"(?P<user_agent>.+)\"'
@@ -67,4 +70,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("logfile")
     args = parser.parse_args()
+    start = time.time()
     analyze(args.logfile)
+    print(f"Executed in {time.time() - start:.2f}s")
