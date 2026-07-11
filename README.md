@@ -13,6 +13,10 @@ python3 analyzer.py /path/to/access.log
 python3 analyzer.py /home/user/logs/access.log
 ```
 
+## Optional Flags
+- `--top N` — show top N endpoints (default: 10)
+- `--json` — output results in JSON format
+
 ## Output 
 - Total lines
 - Bad lines 
