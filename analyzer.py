@@ -107,13 +107,14 @@ def analyze(filePath, top = 10, as_json = False):
             if count > SUSPICIOUS_THRESHOLD:
                 print(f"{ip} -> {count} failed login attempts")
 
-        print("\n5xx Spike Detection:")
-        averageErrors = sum(errors_per_hour.values()) / len(errors_per_hour)
-        spikeThreshold = 2 * averageErrors
-        for hour in sorted(errors_per_hour.keys()):
-            if errors_per_hour[hour] >  spikeThreshold:
-                print(f"{hour}:00 → SPIKE: {errors_per_hour[hour]} errors (avg: {averageErrors:.0f})")
-
+        if errors_per_hour:
+            averageErrors = sum(errors_per_hour.values()) / len(errors_per_hour)
+            spikeThreshold = 2 * averageErrors
+            for hour in sorted(errors_per_hour.keys()):
+                if errors_per_hour[hour] > spikeThreshold:
+                    print(f"{hour}:00 → SPIKE: {errors_per_hour[hour]} errors (avg: {averageErrors:.0f})")
+        else:
+            print("No 5xx errors detected")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("logfile")
