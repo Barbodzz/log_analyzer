@@ -36,6 +36,7 @@ def analyze(filePath, top = 10, as_json = False):
         endpoints = Counter()
         times = Counter()
         failedLoginRequests = Counter()
+        errors_per_hour = Counter()
         for line in f:
             lineCounter+=1
             parsed = parse_line(line)
@@ -43,12 +44,16 @@ def analyze(filePath, top = 10, as_json = False):
                 path = parsed.get("path")
                 ip = parsed.get("ip")
                 ips.add(ip)
+                hour = parsed.get("time")[12:14] # extract hour (index 12:14)
                 endpoints[path] += 1 
-                times[parsed.get("time")[12:14]] += 1 # extract hour (index 12:14)
+                times[hour] += 1 
                 status = parsed.get("status")
 
                 if path == "/login" and status == "401":
                     failedLoginRequests[ip] += 1
+
+                if status[0] == "5":
+                    errors_per_hour[hour] += 1
 
                 if is_error(status):
                     errorCounter+=1
@@ -102,6 +107,13 @@ def analyze(filePath, top = 10, as_json = False):
             if count > SUSPICIOUS_THRESHOLD:
                 print(f"{ip} -> {count} failed login attempts")
 
+        print("\n5xx Spike Detection:")
+        averageErrors = sum(errors_per_hour.values()) / len(errors_per_hour)
+        spikeThreshold = 2 * averageErrors
+        for hour in sorted(errors_per_hour.keys()):
+            if errors_per_hour[hour] >  spikeThreshold:
+                print(f"{hour}:00 → SPIKE: {errors_per_hour[hour]} errors (avg: {averageErrors:.0f})")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("logfile")
@@ -110,4 +122,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     start = time.time()
     analyze(args.logfile, args.top, args.json)
-    print(f"Executed in {time.time() - start:.2f}s")
+    print(f"\nExecuted in {time.time() - start:.2f}s")
