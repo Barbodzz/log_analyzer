@@ -2,6 +2,7 @@ import re
 from collections import Counter
 import argparse
 import time
+import gzip
 
 
 
@@ -21,7 +22,11 @@ def is_error(status):
 
 
 def analyze(filePath):
-    with open(filePath) as f:
+    if filePath.endswith(".gz"):
+        f = gzip.open(filePath, "rt")
+    else:
+        f = open(filePath)
+    with f:
         ips = set()
         lineCounter = 0
         badLineCounter = 0
