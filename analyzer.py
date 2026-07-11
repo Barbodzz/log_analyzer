@@ -3,6 +3,7 @@ from collections import Counter
 import argparse
 import time
 import gzip
+import json
 
 
 
@@ -22,7 +23,7 @@ def is_error(status):
     return status[0] in ("4", "5") 
 
 
-def analyze(filePath, top = 10):
+def analyze(filePath, top = 10, as_json = False):
     if filePath.endswith(".gz"):
         f = gzip.open(filePath, "rt")
     else:
@@ -59,40 +60,54 @@ def analyze(filePath, top = 10):
     validLines = lineCounter - badLineCounter
     errorRate = ( errorCounter / validLines ) * 100
 
-    print(f"Total lines: {lineCounter}")
-    print(f"\nBad lines: {badLineCounter}")
-    print(f"\nValid lines: {validLines}")
-    print(f"\nUnique ips: {len(ips)}")
-    print("\nMost common endpoints")
+    result = {
+        "total_lines": lineCounter,
+        "bad_lines": badLineCounter,
+        "valid_lines": validLines,
+        "unique_ips": len(ips),
+        "top_endpoints": endpoints.most_common(top),
+        "error_rate": errorRate,
+        "time_distribution": dict(sorted(times.items())),
+        "suspicious_ips": {ip: count for ip, count in failedLoginRequests.items() if count > SUSPICIOUS_THRESHOLD},
+    }
+    if as_json:
+        print(json.dumps(result, indent = 2))
+    else:
+        print(f"Total lines: {lineCounter}")
+        print(f"\nBad lines: {badLineCounter}")
+        print(f"\nValid lines: {validLines}")
+        print(f"\nUnique ips: {len(ips)}")
+        print("\nMost common endpoints")
 
-    header_ep = "endpoint"
-    header_c = "count"
-    print(f"{header_ep:<20} | {header_c}")
-    for endpoint in endpoints.most_common(top):
-        print(f"{endpoint[0]:<20} | {endpoint[1]}")
+        header_ep = "endpoint"
+        header_c = "count"
+        print(f"{header_ep:<20} | {header_c}")
+        for endpoint in endpoints.most_common(top):
+            print(f"{endpoint[0]:<20} | {endpoint[1]}")
 
-    print(f"\nError rate: {errorRate:.2f}%")
+        print(f"\nError rate: {errorRate:.2f}%")
 
-    print("\nTime distribution:")
-    for hour in sorted(times.keys()):
-        print(f"{hour}:00 | {times[hour]}")
-    
-    print("Time distribution chart")
-    maxValue = max(times.values())
-    scale = maxValue / 25
-    for hour in sorted(times.keys()):
-        print(f"{hour}:00 | {BAR * int(times[hour] / scale)}")
+        print("\nTime distribution:")
+        for hour in sorted(times.keys()):
+            print(f"{hour}:00 | {times[hour]}")
+        
+        print("Time distribution chart")
+        maxValue = max(times.values())
+        scale = maxValue / 25
+        for hour in sorted(times.keys()):
+            print(f"{hour}:00 | {BAR * int(times[hour] / scale)}")
 
-    print("Suspicious IPs")
-    for ip, count in failedLoginRequests.items():
-        if count > SUSPICIOUS_THRESHOLD:
-            print(f"{ip} -> {count} failed login attempts")
+        print("Suspicious IPs")
+        for ip, count in failedLoginRequests.items():
+            if count > SUSPICIOUS_THRESHOLD:
+                print(f"{ip} -> {count} failed login attempts")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("logfile")
     parser.add_argument("--top", type=int, default=10)
+    parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     start = time.time()
-    analyze(args.logfile, args.top)
+    analyze(args.logfile, args.top, args.json)
     print(f"Executed in {time.time() - start:.2f}s")
