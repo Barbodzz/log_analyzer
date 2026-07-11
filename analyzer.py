@@ -31,19 +31,27 @@ def analyze(filePath):
                     errorCounter+=1
                 continue
             badLineCounter+=1
+
+
     validLines = lineCounter - badLineCounter
     errorRate = ( errorCounter / validLines ) * 100
+
     print(f"Total lines: {lineCounter}")
     print(f"\nBad lines: {badLineCounter}")
     print(f"\nUnique ips: {len(ips)}")
-    print("Most common endpoints")
+    print("\nMost common endpoints")
     print(f"{"endpoint":<20} | {"count"}")
     for endpoint in endpoints.most_common(10):
         print(f"{endpoint[0]:<20} | {endpoint[1]}")
-    print(f"Error rate: {errorRate:.2f}%")
+    print(f"\nError rate: {errorRate:.2f}%")
     print("\nTime distribution:")
     for hour in sorted(times.keys()):
         print(f"{hour}:00 | {times[hour]}")
+    print("Time distribution chart")
+    maxValue = max(times.values())
+    scale = maxValue / 25
+    for hour in sorted(times.keys()):
+        print(f"{hour}:00 | {'\u2588' * int(times[hour] / scale)}")
 
 
 if __name__ == "__main__":
