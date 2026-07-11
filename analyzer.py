@@ -38,6 +38,7 @@ def analyze(filePath):
 
     print(f"Total lines: {lineCounter}")
     print(f"\nBad lines: {badLineCounter}")
+    print(f"\nValid lines: {validLines}")
     print(f"\nUnique ips: {len(ips)}")
     print("\nMost common endpoints")
     print(f"{"endpoint":<20} | {"count"}")
