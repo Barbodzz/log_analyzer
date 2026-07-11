@@ -1,9 +1,12 @@
 import re
 from collections import Counter
+import argparse
 
 PATTERN = re.compile(
     r'(?P<ip>\S+) - - \[(?P<time>.+)\] \"(?P<method>\S+) (?P<path>\S+) (?P<protocol>\S+)\" (?P<status>\d+) (?P<size>\d+) \"-\" \"(?P<user_agent>.+)\"'
 )
+BAR = '\u2588'
+
 def parse_line(line):
     match = PATTERN.match(line)
     if match:
@@ -25,12 +28,12 @@ def analyze(filePath):
             if parsed:
                 ips.add(parsed.get("ip"))
                 endpoints[parsed.get("path")] += 1 
-                times[parsed.get("time")[12:14]] += 1
+                times[parsed.get("time")[12:14]] += 1 # extract hour (index 12:14)
                 status = parsed.get("status")
                 if status[0] == "4" or status[0] == "5":
                     errorCounter+=1
                 continue
-            badLineCounter+=1
+            badLineCounter+=1 # malformed line, skip and count
 
 
     validLines = lineCounter - badLineCounter
@@ -41,7 +44,9 @@ def analyze(filePath):
     print(f"\nValid lines: {validLines}")
     print(f"\nUnique ips: {len(ips)}")
     print("\nMost common endpoints")
-    print(f"{"endpoint":<20} | {"count"}")
+    header_ep = "endpoint"
+    header_c = "count"
+    print(f"{header_ep:<20} | {header_c}")
     for endpoint in endpoints.most_common(10):
         print(f"{endpoint[0]:<20} | {endpoint[1]}")
     print(f"\nError rate: {errorRate:.2f}%")
@@ -52,11 +57,10 @@ def analyze(filePath):
     maxValue = max(times.values())
     scale = maxValue / 25
     for hour in sorted(times.keys()):
-        print(f"{hour}:00 | {'\u2588' * int(times[hour] / scale)}")
+        print(f"{hour}:00 | {BAR * int(times[hour] / scale)}")
 
 
 if __name__ == "__main__":
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("logfile")
     args = parser.parse_args()
