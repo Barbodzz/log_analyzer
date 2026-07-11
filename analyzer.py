@@ -13,6 +13,9 @@ def parse_line(line):
         return match.groupdict()
     return None
 
+def is_error(status):
+    return status[0] in ("4", "5") 
+
 
 def analyze(filePath):
     with open(filePath) as f:
@@ -30,7 +33,7 @@ def analyze(filePath):
                 endpoints[parsed.get("path")] += 1 
                 times[parsed.get("time")[12:14]] += 1 # extract hour (index 12:14)
                 status = parsed.get("status")
-                if status[0] == "4" or status[0] == "5":
+                if is_error(status):
                     errorCounter+=1
                 continue
             badLineCounter+=1 # malformed line, skip and count
