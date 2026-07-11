@@ -22,6 +22,7 @@ python3 analyzer.py /home/user/logs/access.log
 - Error rate (4xx/5xx)
 - Hourly request distribution with ASCII histogram
 - Suspicious IPs (failed login attempts above threshold)
+- 5xx spike detection (hours with error rate above 2x average)
 
 ## Design Decisions 
 ### Parsing
@@ -40,6 +41,10 @@ Tracks IPs with excessive 401 responses on `/login`.
 A fixed threshold of 50 was chosen since brute force attacks 
 typically generate hundreds of attempts, making relative 
 statistical methods unreliable on sparse data.
+### 5xx Spike Detection
+Used 2x average errors per hour as the spike threshold. 
+Percentile was not suitable since the dataset only covers 10 hours, 
+making statistical methods unreliable on such small samples.
 
 ## Challenges
 For counting endpoints, I initially tried using a plain dictionary — storing 
